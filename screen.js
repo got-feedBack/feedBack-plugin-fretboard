@@ -32,7 +32,7 @@ function _fbInjectButton() {
     btn.textContent = 'Fretboard';
     btn.title = 'Toggle fretboard overlay';
     btn.onclick = _fbToggle;
-    controls.insertBefore(btn, closeBtn);
+    if (closeBtn && closeBtn.parentNode === controls) controls.insertBefore(btn, closeBtn); else controls.appendChild(btn);
 }
 
 function _fbToggle() {
@@ -65,7 +65,7 @@ function _fbCreateCanvas() {
 
     // Insert before the controls bar
     const controls = document.getElementById('player-controls');
-    player.insertBefore(_fbCanvas, controls);
+    if (controls && controls.parentNode === player) player.insertBefore(_fbCanvas, controls); else player.appendChild(_fbCanvas);
 
     // Dismiss button — small ✕ at top-right of the overlay. Sibling of the
     // canvas (not drawn into it) so pointer-events:auto makes it clickable
@@ -81,7 +81,7 @@ function _fbCreateCanvas() {
         'border-radius:4px;color:#aaa;cursor:pointer;font-size:12px;' +
         'pointer-events:auto;';
     _fbDismissBtn.onclick = _fbToggle;
-    player.insertBefore(_fbDismissBtn, controls);
+    if (controls && controls.parentNode === player) player.insertBefore(_fbDismissBtn, controls); else player.appendChild(_fbDismissBtn);
 
     _fbCtx = _fbCanvas.getContext('2d');
     _fbResize();
