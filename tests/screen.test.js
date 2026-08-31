@@ -15,6 +15,55 @@ function freshPlugin() {
 
 const mod = freshPlugin();
 
+test('uses the host string count for bass and extended-range charts', () => {
+    for (const count of [4, 6, 7, 8]) {
+        const highway = { getStringCount: () => count };
+        assert.equal(mod._fbResolveStringCount(highway), count);
+    }
+});
+
+test('falls back to metadata and instrument-aware defaults on older hosts', () => {
+    assert.equal(mod._fbResolveStringCount({}, { stringCount: 7 }), 7);
+    assert.equal(mod._fbResolveStringCount({}, { arrangement: 'Bass' }), 4);
+    assert.equal(mod._fbResolveStringCount({}, { arrangement: 'Lead' }), 6);
+});
+
+test('builds standard top-to-bottom labels for common string counts', () => {
+    assert.deepEqual(mod._fbStringNames(4, { arrangement: 'Bass' }), ['G', 'D', 'A', 'E']);
+    assert.deepEqual(mod._fbStringNames(5, { arrangement: 'Bass' }), ['G', 'D', 'A', 'E', 'B']);
+    assert.deepEqual(mod._fbStringNames(6, { arrangement: 'Bass' }), ['C', 'G', 'D', 'A', 'E', 'B']);
+    assert.deepEqual(mod._fbStringNames(6, { arrangement: 'Lead' }), ['e', 'B', 'G', 'D', 'A', 'E']);
+    assert.deepEqual(mod._fbStringNames(7, { arrangement: 'Lead' }), ['e', 'B', 'G', 'D', 'A', 'E', 'B']);
+    assert.deepEqual(mod._fbStringNames(8, { arrangement: 'Lead' }), ['e', 'B', 'G', 'D', 'A', 'E', 'B', 'F#']);
+});
+
+test('maps low-to-high chart indices onto high-to-low display rows', () => {
+    assert.equal(mod._fbDisplayStringIndex(0, 4), 3);
+    assert.equal(mod._fbDisplayStringIndex(3, 4), 0);
+    assert.equal(mod._fbDisplayStringIndex(0, 7), 6);
+    assert.equal(mod._fbDisplayStringIndex(6, 7), 0);
+    assert.equal(mod._fbDisplayStringIndex(7, 7), -1);
+});
+
+test('provides stable normal and bright colors for extended strings', () => {
+    for (let string = 0; string < 8; string++) {
+        assert.match(mod._fbStringColor(string), /^#[0-9a-f]{6}$/i);
+        assert.match(mod._fbStringColor(string, true), /^#[0-9a-f]{6}$/i);
+    }
+});
+
+test('scales string spacing and fret markers for every supported width', () => {
+    for (const count of [4, 6, 7, 8]) {
+        const layout = mod._fbLayout(800, 150, count);
+        assert.equal(layout.stringSpan, count - 1);
+        assert.equal(layout.fretboardBottom, 130);
+        assert.equal(layout.singleDotY, 70);
+        assert.ok(layout.doubleDotYs[0] < layout.singleDotY);
+        assert.ok(layout.doubleDotYs[1] > layout.singleDotY);
+        assert.equal(layout.doubleDotYs[0] + layout.doubleDotYs[1], 140);
+    }
+});
+
 test('a note within the 80ms window and no sustain is fully active', () => {
     const active = mod._fbGetActiveNotes(1.0, [{ t: 1.0, s: 0, f: 3 }], null);
     assert.deepEqual(active, [{ s: 0, f: 3, alpha: 1 }]);
