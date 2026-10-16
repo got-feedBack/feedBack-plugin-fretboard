@@ -5,6 +5,6 @@
   "private": false,
   "script": "screen.js",
   "category": "practice",
-  "description": "Interactive fretboard reference and note trainer.",
+  "description": "Live fretboard view of the notes being played.",
   "icon": "assets/thumb.svg"
 }
