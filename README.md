@@ -19,7 +19,14 @@ git clone https://github.com/got-feedback/feedback-plugin-fretboard.git fretboar
 docker compose restart
 ```
 
-A "Fretboard" button will appear in the player controls when you play a song.
+Fretboard View is also bundled with the feedBack Desktop app.
+
+## Usage
+
+1. Play a song.
+2. Click **Fretboard**. In the v3 UI it sits in the **Plugin controls** popover on the player rail.
+3. The fretboard appears above the player controls and lights up notes as they come.
+4. Click **Fretboard ✓**, or the ✕ at the top-right of the fretboard, to hide it.
 
 ## How It Works
 
